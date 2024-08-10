@@ -537,7 +537,7 @@ async def extract_movie_info(caption):
     return None, None
     
 async def get_movie_poster(movie_name, release_year):
-    TMDB_API = config_dict['TMDB_API_KEY']
+    TMDB_API_KEY = config_dict['TMDB_API_KEY']
     tmdb_search_url = f'https://api.themoviedb.org/3/search/multi?api_key={TMDB_API_KEY}&query={movie_name}'
     
     try:
