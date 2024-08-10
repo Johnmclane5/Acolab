@@ -560,15 +560,17 @@ async def get_movie_poster(movie_name, release_year):
                         movie_id = result['id']
                         media_type = result['media_type']
 
-                        tmdb_movie_url = f'https://api.themoviedb.org/3/{media_type}/{movie_id}/images?api_key={TMDB_API}&language=en-US&include_image_language=null'
+                        tmdb_movie_url = f'https://api.themoviedb.org/3/{media_type}/{movie_id}/images?api_key={TMDB_API_KEY}&language=en-US&include_image_language=en,hi'
 
                         async with session.get(tmdb_movie_url) as movie_response:
                             movie_data = await movie_response.json()
 
                         # Use the first backdrop image path from either detailed data or result
                         backdrop_path = None
-                        if 'posters' in movie_data and movie_data['posters']:
-                            poster_path = movie_data['posters'][0]['file_path']
+                        if 'backdrops' in movie_data and movie_data['backdrops']:
+                            poster_path = movie_data['backdrops'][0]['file_path']
+                        elif 'backdrop_path' in result and result['backdrop_path']:
+                            poster_path = result['backdrop_path']
                         elif 'poster_path' in result and result['poster_path']:
                             poster_path = result['poster_path']
                         if poster_path:
