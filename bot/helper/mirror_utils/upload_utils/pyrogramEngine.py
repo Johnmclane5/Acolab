@@ -438,7 +438,7 @@ class TgUploader:
                                                                     height=height,
                                                                     thumb=thumb,
                                                                     supports_streaming=True,
-                                                                    has_spoiler=True,
+                                                                    has_spoiler=config_dict['SET_SPOILER'],
                                                                     disable_notification=True,
                                                                     progress=self.__upload_progress,
                                                                     reply_markup=buttons)
