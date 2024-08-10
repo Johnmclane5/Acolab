@@ -30,7 +30,7 @@ psutil
 pybase64
 pycountry
 python-dotenv
-git+https://github.com/5hojib/pyrogram-peer-fix.git
+pyrofork==2.2.11
 pyshorteners
 python-magic
 quoters
