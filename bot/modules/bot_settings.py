@@ -42,6 +42,7 @@ default_values = {'DEFAULT_UPLOAD': 'gd',
 bool_vars = ['AS_DOCUMENT',
              'STOP_DUPLICATE',
              'SET_COMMANDS',
+             'SET_SPOILER',
              'SHOW_MEDIAINFO',
              'USE_SERVICE_ACCOUNTS',
              'WEB_PINCODE',
@@ -345,6 +346,9 @@ async def load_config():
 
     SET_COMMANDS = environ.get('SET_COMMANDS', '')
     SET_COMMANDS = SET_COMMANDS.lower() == 'true'
+
+    SET_SPOILER = environ.get('SET_SPOILER', '')
+    SET_SPOILER = SET_SPOILER.lower() == 'true'
     
     TOKEN_TIMEOUT = environ.get('TOKEN_TIMEOUT', '')
     TOKEN_TIMEOUT = int(TOKEN_TIMEOUT) if TOKEN_TIMEOUT.isdigit() else ''
@@ -441,6 +445,7 @@ async def load_config():
                         'SEARCH_LIMIT': SEARCH_LIMIT,
                         'SEARCH_PLUGINS': SEARCH_PLUGINS,
                         'SET_COMMANDS': SET_COMMANDS,
+                        'SET_SPOILER': SET_SPOILER,
                         'SHOW_MEDIAINFO': SHOW_MEDIAINFO,
                         'STOP_DUPLICATE': STOP_DUPLICATE,
                         'SUDO_USERS': SUDO_USERS,
