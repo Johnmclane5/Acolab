@@ -371,7 +371,7 @@ SET_COMMANDS = environ.get('SET_COMMANDS', '')
 SET_COMMANDS = SET_COMMANDS.lower() == 'true'
 
 SET_SPOILER = environ.get('SET_SPOILER', '')
-SET_SPOILER = SET_COMMANDS.lower() == 'true'
+SET_SPOILER = SET_SPOILER.lower() == 'true'
 
 
 TOKEN_TIMEOUT = environ.get('TOKEN_TIMEOUT', '')
