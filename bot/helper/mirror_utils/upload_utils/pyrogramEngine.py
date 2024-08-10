@@ -535,10 +535,11 @@ async def extract_movie_info(caption):
     except Exception as e:
         print(e)
     return None, None
-
+    
 async def get_movie_poster(movie_name, release_year):
     TMDB_API = config_dict['TMDB_API_KEY']
-    tmdb_search_url = f'https://api.themoviedb.org/3/search/multi?api_key={TMDB_API}&query={movie_name}'
+    tmdb_search_url = f'https://api.themoviedb.org/3/search/multi?api_key={TMDB_API_KEY}&query={movie_name}'
+    
     try:
         async with aiohttp.ClientSession() as session:
             async with session.get(tmdb_search_url) as search_response:
@@ -560,32 +561,24 @@ async def get_movie_poster(movie_name, release_year):
                         movie_id = result['id']
                         media_type = result['media_type']
 
-                        tmdb_movie_url = f'https://api.themoviedb.org/3/{media_type}/{movie_id}/images?api_key={TMDB_API_KEY}&language=en-US&include_image_language=en,hi'
+                        tmdb_movie_image_url = f'https://api.themoviedb.org/3/{media_type}/{movie_id}/images?api_key={TMDB_API_KEY}&language=en-US&include_image_language=en,hi'
 
-                        async with session.get(tmdb_movie_url) as movie_response:
-                            movie_data = await movie_response.json()
+                        async with session.get(tmdb_movie_image_url) as movie_response:
+                            movie_images = await movie_response.json()
+ 
+                        # Use the backdrop_path or poster_path
+                            poster_path = None
+                            if 'backdrops' in movie_images and movie_images['backdrops']:
+                                poster_path = movie_images['backdrops'][0]['file_path']
+                                                        
+                            elif 'backdrop_path' in result and result['backdrop_path']:
+                                poster_path = result['backdrop_path']
 
-                        # Use the first backdrop image path from either detailed data or result
-                        backdrop_path = None
-                        if 'backdrops' in movie_data and movie_data['backdrops']:
-                            poster_path = movie_data['backdrops'][0]['file_path']
-                        elif 'backdrop_path' in result and result['backdrop_path']:
-                            poster_path = result['backdrop_path']
-                        elif 'poster_path' in result and result['poster_path']:
-                            poster_path = result['poster_path']
-                        if poster_path:
+                            elif 'poster_path' in result and result['poster_path']:
+                                poster_path = result['poster_path']
+
                             poster_url = f"https://image.tmdb.org/t/p/original{poster_path}"
                             return poster_url
-                        else:
-                            print(
-                                "Failed to obtain backdrop and poster paths from movie_data and result")
-
-                    else:
-                        print(
-                            f"No matching results found for movie: {movie_name} ({release_year})")
-
-                else:
-                    print(f"No results found for movie: {movie_name}")
 
     except Exception as e:
         print(f"Error fetching TMDB data: {e}")
