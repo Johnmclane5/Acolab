@@ -31,8 +31,11 @@ from bot.helper.mirror_utils.rclone_utils.transfer import RcloneTransferHelper
 from bot.helper.telegram_helper.message_utils import sendCustomMsg, sendMessage, editMessage, delete_all_messages, delete_links, sendMultiMessage, update_all_messages, deleteMessage, five_minute_del
 from bot.helper.telegram_helper.button_build import ButtonMaker
 from bot.helper.ext_utils.db_handler import DbManager
-
-
+from bot.helper.ext_utils.aeon_utils import tinyfy
+from bot.helper.ext_utils.shortners import short_url
+from bot.helper.mirror_utils.upload_utils
+from bot.helper.ext_utils.aeon_utils import extract_movie_info, get_movie_poster
+from bot.helper.ext_utils.leech_utils import remove_extension
 
 class MirrorLeechListener:
     def __init__(self, message, compress=False, extract=False, isQbit=False, isLeech=False, tag=None, select=False, seed=False, sameDir=None, rcFlags=None, upPath=None, isClone=False, join=False, isYtdlp=False, drive_id=None, index_link=None, leech_utils={}):
@@ -428,6 +431,7 @@ class MirrorLeechListener:
                 msg += f'<b>• Files: </b>{files}\n'
             if link or rclonePath and config_dict['RCLONE_SERVE_URL']:
                 if link:
+                    shortlink = tinyfy(short_url(link)
                     buttons.ubutton('Cloud link', link)
                 else:
                     msg += f'<b>• Path: </b><code>{rclonePath}</code>\n'
@@ -454,7 +458,11 @@ class MirrorLeechListener:
             msg += f'<b>• Uploaded by: </b>{self.message.from_user.mention()}\n\n'
             if config_dict['MIRROR_LOG_ID']:
                 buttonss = button
-                log_msg = list((await sendMultiMessage(config_dict['MIRROR_LOG_ID'], nmsg + msg, buttonss)).values())[0]
+                movie_name, release_year = await extract_movie_info(name)
+                tmdb_poster_url = await get_movie_poster(movie_name, release_year)
+                new_caption = await remove_extension(name)
+                log_msg = list((await sendMultiMessage(config_dict['LEECH_LOG_ID'], nmsg + msg, buttonss)).values())[0]
+                await sendMessage(config_dict['MIRROR_LOG_ID'], f'<b>{escape(new_caption)}\n\n<a href={shortlink}>☁️ Cloud Link></a><b>', None, tmdb_poster_url)
                 if self.linkslogmsg:
                     await deleteMessage(self.linkslogmsg)
             buttons = ButtonMaker()
