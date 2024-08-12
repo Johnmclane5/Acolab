@@ -327,6 +327,10 @@ async def load_config():
     if len(MIRROR_LOG_ID) == 0:
         MIRROR_LOG_ID = ''
 
+    CAPTION_LOG_ID = environ.get('CAPTION_LOG_ID', '')
+    if len(CAPTION_LOG_ID) == 0:
+        CAPTION_LOG_ID = ''
+
     USER_MAX_TASKS = environ.get('USER_MAX_TASKS', '')
     USER_MAX_TASKS = '' if len(USER_MAX_TASKS) == 0 else int(USER_MAX_TASKS)
 
@@ -414,6 +418,7 @@ async def load_config():
                         'USER_MAX_TASKS': USER_MAX_TASKS,
                         'PLAYLIST_LIMIT': PLAYLIST_LIMIT,
                         'MIRROR_LOG_ID': MIRROR_LOG_ID,
+                        'CAPTION_LOG_ID': CAPTION_LOG_ID,
                         'LEECH_DUMP_ID': LEECH_DUMP_ID,
                         'IMAGES': IMAGES,
                         'IMG_SEARCH': IMG_SEARCH,
