@@ -33,7 +33,6 @@ from bot.helper.telegram_helper.button_build import ButtonMaker
 from bot.helper.ext_utils.db_handler import DbManager
 from bot.helper.ext_utils.aeon_utils import tinyfy
 from bot.helper.ext_utils.shortners import short_url
-from bot.helper.mirror_utils.upload_utils
 from bot.helper.ext_utils.aeon_utils import extract_movie_info, get_movie_poster
 from bot.helper.ext_utils.leech_utils import remove_extension
 
