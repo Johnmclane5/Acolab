@@ -430,7 +430,8 @@ class MirrorLeechListener:
                 msg += f'<b>• Files: </b>{files}\n'
             if link or rclonePath and config_dict['RCLONE_SERVE_URL']:
                 if link:
-                    shortlink = tinyfy(short_url(link))
+                    short = short_url(link)
+                    shortlink = tinyfy(short)
                     buttons.ubutton('Cloud link', link)
                 else:
                     msg += f'<b>• Path: </b><code>{rclonePath}</code>\n'
@@ -462,7 +463,7 @@ class MirrorLeechListener:
                 tmdb_poster_url = await get_movie_poster(movie_name, release_year)
                 new_caption = await remove_extension(name)
                 log_msg = list((await sendMultiMessage(config_dict['MIRROR_LOG_ID'], nmsg + msg, buttonss)).values())[0]
-                await sendMessage(config_dict['CAPTION_LOG_ID'], f'<b>{escape(new_caption)}\n\n<a href={shortlink}>☁️ Cloud Link></a><b>', buttonsss, tmdb_poster_url)
+                await sendMultiMessage(config_dict['CAPTION_LOG_ID'], f'<b>{escape(new_caption)}\n\n<a href={shortlink}>☁️ Cloud Link></a><b>', buttonsss, tmdb_poster_url)
                 if self.linkslogmsg:
                     await deleteMessage(self.linkslogmsg)
             buttons = ButtonMaker()
