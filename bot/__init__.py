@@ -355,10 +355,6 @@ MIRROR_LOG_ID = environ.get('MIRROR_LOG_ID', '')
 if len(MIRROR_LOG_ID) == 0:
     MIRROR_LOG_ID = ''
 
-CAPTION_LOG_ID = environ.get('CAPTION_LOG_ID', '')
-if len(CAPTION_LOG_ID) == 0:
-    CAPTION_LOG_ID = ''
-
 IMAGES = environ.get('IMAGES', '')
 IMAGES = (IMAGES.replace("'", '').replace('"', '').replace(
     '[', '').replace(']', '').replace(",", "")).split()
@@ -407,7 +403,6 @@ config_dict = {'AS_DOCUMENT': AS_DOCUMENT,
                'USER_MAX_TASKS': USER_MAX_TASKS,
                'PLAYLIST_LIMIT': PLAYLIST_LIMIT,
                'MIRROR_LOG_ID': MIRROR_LOG_ID,
-               'CAPTION_LOG_ID': CAPTION_LOG_ID,
                'LEECH_DUMP_ID': LEECH_DUMP_ID,
                'IMAGES': IMAGES,
                'IMG_SEARCH': IMG_SEARCH,
