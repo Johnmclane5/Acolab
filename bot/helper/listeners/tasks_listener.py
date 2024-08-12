@@ -430,7 +430,7 @@ class MirrorLeechListener:
                 msg += f'<b>• Files: </b>{files}\n'
             if link or rclonePath and config_dict['RCLONE_SERVE_URL']:
                 if link:
-                    shortlink = tinyfy(short_url(link)
+                    shortlink = tinyfy(short_url(link))
                     buttons.ubutton('Cloud link', link)
                 else:
                     msg += f'<b>• Path: </b><code>{rclonePath}</code>\n'
