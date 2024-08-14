@@ -456,12 +456,12 @@ class MirrorLeechListener:
             msg += f'<b>• Uploaded by: </b>{self.message.from_user.mention()}\n\n'
             if config_dict['MIRROR_LOG_ID']:
                 buttonss = button
-                buttonsss = None
-                movie_name, release_year = await extract_movie_info(name)
-                tmdb_poster_url = await get_movie_poster(movie_name, release_year)
+                #buttonsss = None
+                #movie_name, release_year = await extract_movie_info(name)
+                #tmdb_poster_url = await get_movie_poster(movie_name, release_year)
                 new_caption = await remove_extension(name)
                 log_msg = list((await sendMultiMessage(config_dict['MIRROR_LOG_ID'], nmsg + msg, buttonss)).values())[0]
-                await sendMultiMessage(config_dict['MIRROR_LOG_ID'], f'<b>🗃 {escape(new_caption)}\n\n<a href={tinyfy(short_url(link))}>☁️ Cloud Link</a></b>', buttonsss, tmdb_poster_url)
+                await sendMultiMessage(config_dict['MIRROR_LOG_ID'], f'<b>🗃 {escape(new_caption)}\n\n<a href={tinyfy(short_url(link))}>☁️ Cloud Link</a></b>')
                 if self.linkslogmsg:
                     await deleteMessage(self.linkslogmsg)
             buttons = ButtonMaker()
