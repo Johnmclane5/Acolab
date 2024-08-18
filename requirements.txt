@@ -30,7 +30,7 @@ psutil
 pybase64
 pycountry
 python-dotenv
-pyrotgfork
+pyrofork=2.2.10
 pyshorteners
 python-magic
 quoters
