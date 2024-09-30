@@ -32,6 +32,7 @@ async def get_movie_poster(movie_name, release_year):
     
     try:
         async with aiohttp.ClientSession() as session:
+            # Search for the movie/TV show using the multi-search endpoint
             async with session.get(tmdb_search_url) as search_response:
                 search_data = await search_response.json()
 
@@ -40,36 +41,40 @@ async def get_movie_poster(movie_name, release_year):
                     matching_results = [
                         result for result in search_data['results']
                         if ('release_date' in result and result['release_date'][:4] == str(release_year)) or
-                        ('first_air_date' in result and result['first_air_date'][:4] == str(
-                            release_year))
+                           ('first_air_date' in result and result['first_air_date'][:4] == str(release_year))
                     ]
 
                     if matching_results:
                         result = matching_results[0]
+                        movie_id = result['id']
+                        media_type = result['media_type']
 
-                        # Fetch additional details using movie ID
-                        #movie_id = result['id']
-                        #media_type = result['media_type']
+                        # Fetch images from the movie/TV show using the /images endpoint
+                        # Include no language poster by passing 'null' in include_image_language
+                        tmdb_movie_image_url = f'https://api.themoviedb.org/3/{media_type}/{movie_id}/images?api_key={TMDB_API_KEY}&include_image_language=null'
 
-                        #tmdb_movie_image_url = f'https://api.themoviedb.org/3/{media_type}/{movie_id}/images?api_key={TMDB_API_KEY}&language=en-US&include_image_language=en,hi'
+                        async with session.get(tmdb_movie_image_url) as movie_response:
+                            movie_images = await movie_response.json()
 
-                        #async with session.get(tmdb_movie_image_url) as movie_response:
-                            #movie_images = await movie_response.json()
- 
-                        # Use the backdrop_path or poster_path
-                        poster_path = None
-                            #if 'backdrops' in movie_images and movie_images['backdrops']:
-                                #poster_path = movie_images['backdrops'][0]['file_path']
-                                                        
-                            #elif 'backdrop_path' in result and result['backdrop_path']:
-                               #poster_path = result['backdrop_path']
+                            # Check if posters exist in the image results
+                            if 'posters' in movie_images and movie_images['posters']:
+                                # Use the first available poster (including no-language posters)
+                                poster_path = movie_images['posters'][0]['file_path']
+                                poster_url = f"https://image.tmdb.org/t/p/original{poster_path}"
+                                return poster_url
 
+                        # Fallback: Use the poster_path from the search result
                         if 'poster_path' in result and result['poster_path']:
                             poster_path = result['poster_path']
-
                             poster_url = f"https://image.tmdb.org/t/p/original{poster_path}"
                             return poster_url
+                        else:
+                            print(f"No poster available for {movie_name} ({release_year}).")
+                    else:
+                        print(f"No matching results found for {movie_name} ({release_year}).")
 
+    except aiohttp.ClientError as e:
+        print(f"Network error while fetching TMDB data: {e}")
     except Exception as e:
         print(f"Error fetching TMDB data: {e}")
 
