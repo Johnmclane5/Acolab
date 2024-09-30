@@ -11,7 +11,7 @@ bencoding
 cinemagoer
 cloudscraper
 dnspython
-feedparser
+feedparser 
 flask
 gevent
 google-api-python-client
@@ -30,7 +30,7 @@ psutil
 pybase64
 pycountry
 python-dotenv
-pyrofork
+pyrofork==2.2.11
 pyshorteners
 python-magic
 quoters
