@@ -69,7 +69,8 @@ async def get_movie_poster(movie_name, release_year):
                             poster_url = f"https://image.tmdb.org/t/p/original{poster_path}"
                             return poster_url
                         else:
-                            print(f"No poster available for {movie_name} ({release_year}).")
+                            poster_url = "https://mltg.sshemw.workers.dev/download.aspx?file=Rmc5CNBbteHKNWIlcsVszskaLDT4SnTuGy64qkwYLqWLeihA4S3FDsuImfVm%2Fz8t&expiry=ndiT7gBwYd9%2F%2FRPVnNFpRw%3D%3D&mac=bf15b6af0bdabafeb9a41b4bcd088c8c05f870c1bc3eb6bc2222aefaf5f1c7a5"
+                            return poster_url
                     else:
                         print(f"No matching results found for {movie_name} ({release_year}).")
 
