@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 from tzlocal import get_localzone
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
-from pyrogram import Client as tgClient, enums
+from pyrogram import Client as tgClient, enums, utils as pyroutils
 from pymongo import MongoClient
+from inspect import signature
 from asyncio import Lock
 from dotenv import load_dotenv, dotenv_values
 from threading import Thread
@@ -18,6 +19,8 @@ from logging import getLogger, FileHandler, StreamHandler, INFO, basicConfig, er
 faulthandler_enable()
 setdefaulttimeout(600)
 
+pyroutils.MIN_CHAT_ID = -999999999999
+pyroutils.MIN_CHANNEL_ID = -100999999999999
 botStartTime = time()
 
 basicConfig(format="[%(asctime)s] [%(levelname)s] - %(message)s",
@@ -157,13 +160,18 @@ if len(EXTENSION_FILTER) > 0:
         x = x.lstrip('.')
         GLOBAL_EXTENSION_FILTER.append(x.strip().lower())
 
+def wztgClient(*args, **kwargs):
+    if 'max_concurrent_transmissions' in signature(tgClient.__init__).parameters:
+        kwargs['max_concurrent_transmissions'] = 1000
+    return tgClient(*args, **kwargs)
+
 IS_PREMIUM_USER = False
 user = ''
 USER_SESSION_STRING = environ.get('USER_SESSION_STRING', '')
 if len(USER_SESSION_STRING) != 0:
     log_info("Creating client from USER_SESSION_STRING")
     try:
-        user = tgClient('user', TELEGRAM_API, TELEGRAM_HASH, session_string = USER_SESSION_STRING, workers = 1000, parse_mode = enums.ParseMode.HTML, no_updates = True).start()
+        user = wztgClient('user', TELEGRAM_API, TELEGRAM_HASH, session_string = USER_SESSION_STRING, workers = 1000, parse_mode = enums.ParseMode.HTML, no_updates = True).start()
         IS_PREMIUM_USER = user.me.is_premium
     except Exception as e:
         log_error(f"Failed making client from USER_SESSION_STRING : {e}")
