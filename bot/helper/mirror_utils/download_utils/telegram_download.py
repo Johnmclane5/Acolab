@@ -110,11 +110,11 @@ class TelegramDownloadHelper:
                 msg, button = await stop_duplicate_check(name, self.__listener)
                 if msg:
                     await sendMessage(self.__listener.message, msg, button)
-                    await delete_links(self.__listener.message)
+                    #await delete_links(self.__listener.message)
                     return
                 if limit_exceeded := await limit_checker(size, self.__listener):
                     await listener.onDownloadError(limit_exceeded)
-                    await delete_links(self.__listener.message)
+                    #await delete_links(self.__listener.message)
                     return
                 added_to_queue, event = await is_queued(self.__listener.uid)
                 if added_to_queue:
