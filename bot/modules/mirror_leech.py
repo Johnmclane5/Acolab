@@ -169,7 +169,7 @@ async def _mirror_leech(client, message, isQbit=False, isLeech=False, sameDir=No
             reply_to, session = await get_tg_link_content(link)
         except Exception as e:
             await sendMessage(message, f'ERROR: {e}')
-            #await delete_links(message)
+            await delete_links(message)
             return
     elif not link and (reply_to := message.reply_to_message):
         if reply_to.text:
@@ -179,7 +179,7 @@ async def _mirror_leech(client, message, isQbit=False, isLeech=False, sameDir=No
                     reply_to, session = await get_tg_link_content(reply_text)
                 except Exception as e:
                     await sendMessage(message, f'ERROR: {e}')
-                    #await delete_links(message)
+                    await delete_links(message)
                     return
 
     if reply_to:
@@ -194,8 +194,8 @@ async def _mirror_leech(client, message, isQbit=False, isLeech=False, sameDir=No
 
     if not is_url(link) and not is_magnet(link) and not await aiopath.exists(link) and not is_rclone_path(link) and file_ is None:
         reply_message = await sendMessage(message, MIRROR_HELP_MESSAGE)
-        #await deleteMessage(message)
-        #await one_minute_del(reply_message)
+        await deleteMessage(message)
+        await one_minute_del(reply_message)
         return
         
     if not name and message.document:
@@ -213,9 +213,9 @@ async def _mirror_leech(client, message, isQbit=False, isLeech=False, sameDir=No
             final_msg += f'\n<b>{__i}</b>: {__msg}\n'
         if error_button is not None:
             error_button = error_button.build_menu(2)
-        #await delete_links(message)
+        await delete_links(message)
         force_m = await sendMessage(message, final_msg, error_button)
-        #await five_minute_del(force_m)
+        await five_minute_del(force_m)
         return
 
     if not is_mega_link(link) and not isQbit and not is_magnet(link) and not is_rclone_path(link) \
@@ -233,10 +233,10 @@ async def _mirror_leech(client, message, isQbit=False, isLeech=False, sameDir=No
                 LOGGER.info(str(e))
                 if str(e).startswith('ERROR:'):
                     await editMessage(process_msg, str(e))
-                    #await delete_links(message)
-                    #await one_minute_del(process_msg)
+                    await delete_links(message)
+                    await one_minute_del(process_msg)
                     return
-            #await deleteMessage(process_msg)
+            await deleteMessage(process_msg)
 
     if not isLeech:
         if config_dict['DEFAULT_UPLOAD'] == 'rc' and not up or up == 'rc':
@@ -264,28 +264,28 @@ async def _mirror_leech(client, message, isQbit=False, isLeech=False, sameDir=No
                 return
         if up != 'gd' and not is_rclone_path(up):
             await sendMessage(message, 'Wrong Rclone Upload Destination!')
-            #await delete_links(message)
+            await delete_links(message)
             return
 
     if link == 'rcl':
         link = await RcloneList(client, message).get_rclone_path('rcd')
         if not is_rclone_path(link):
             await sendMessage(message, link)
-            #await delete_links(message)
+            await delete_links(message)
             return
 
     if up == 'rcl' and not isLeech:
         up = await RcloneList(client, message).get_rclone_path('rcu')
         if not is_rclone_path(up):
             await sendMessage(message, up)
-            #await delete_links(message)
+            await delete_links(message)
             return
 
     listener = MirrorLeechListener(message, compress, extract, isQbit, isLeech, tag, select, seed, sameDir, rcf, up, join, drive_id=drive_id, index_link=index_link, leech_utils={'screenshots': sshots, 'thumb': thumb})
 
     if file_ is not None:
         custom_name = f"{reply_to.caption}"
-        #await delete_links(message)
+        await delete_links(message)
         await TelegramDownloadHelper(listener).add_download(reply_to, f'{path}/', custom_name, session)
     elif isinstance(link, dict):
         await add_direct_download(link, path, listener, name)
@@ -300,7 +300,7 @@ async def _mirror_leech(client, message, isQbit=False, isLeech=False, sameDir=No
             return
         await add_rclone_download(link, config_path, f'{path}/', name, listener)
     elif is_gdrive_link(link):
-        #await delete_links(message)
+        await delete_links(message)
         await add_gd_download(link, path, listener, name)
     else:
         ussr = args['-u']
@@ -309,7 +309,7 @@ async def _mirror_leech(client, message, isQbit=False, isLeech=False, sameDir=No
             auth = f"{ussr}:{pssw}"
             headers += f" authorization: Basic {b64encode(auth.encode()).decode('ascii')}"
         await add_aria2c_download(link, path, listener, name, headers, ratio, seed_time)
-    #await delete_links(message)
+    await delete_links(message)
 
 
 async def mirror(client, message):
