@@ -409,7 +409,6 @@ class TgUploader:
                     else:
                         thumb = await take_ss(self.__up_path, duration)
                         LOGGER.info("Poster not found")
-                        thumb = await self.get_custom_thumb("https://graph.org/file/7fe42849e24d029e06615.jpg")
                 if thumb is not None:
                     with Image.open(thumb) as img:
                         width, height = img.size
