@@ -57,11 +57,8 @@ async def get_movie_poster(movie_name, release_year):
                             movie_images = await movie_response.json()
  
                         # Use the backdrop_path or poster_path
-                            poster_path = None
-                            if 'backdrops' in movie_images and movie_images['backdrops']:
-                                poster_path = movie_images['backdrops'][0]['file_path']
-                                                        
-                            elif 'backdrop_path' in result and result['backdrop_path']:
+                            poster_path = None                                                        
+                            if 'backdrop_path' in result and result['backdrop_path']:
                                 poster_path = result['backdrop_path']
 
                             poster_url = f"https://image.tmdb.org/t/p/original{poster_path}"
