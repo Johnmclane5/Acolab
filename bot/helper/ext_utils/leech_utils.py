@@ -116,26 +116,47 @@ async def get_audio_thumb(audio_file):
 async def take_ss(video_file, duration=None, total=1, gen_ss=False):
     des_dir = ospath.join('Thumbnails', f"{time()}")
     await makedirs(des_dir, exist_ok=True)
+    
     if duration is None:
         duration = (await get_media_info(video_file))[0]
+    
+    # Ensure we only consider the first minute
+    duration = min(duration, 60)
+    
+    # If the video is less than a minute, adjust accordingly
     if duration == 0:
         duration = 3
-    duration = duration - (duration * 2 / 100)
+    
+    duration = duration - (duration * 2 / 100)  # Adjust for some padding
     cmd = ["ffmpeg", "-hide_banner", "-loglevel", "error", "-ss", "", "-i", video_file, "-vf", "thumbnail", "-frames:v", "1", des_dir]
     tasks = []
     tstamps = {}
-    for eq_thumb in range(1, total+1):
-        cmd[5] = str((duration // total) * eq_thumb)
+
+    for eq_thumb in range(1, total + 1):
+        # Distribute screenshots evenly across the first minute
+        timestamp = (duration // total) * eq_thumb
+        cmd[5] = str(timestamp)
+        
+        # Save the timestamp for the generated thumbnail
         tstamps[f"aeon_{eq_thumb}.jpg"] = strftime("%H:%M:%S", gmtime(float(cmd[5])))
+        
+        # Set the output path for each screenshot
         cmd[-1] = ospath.join(des_dir, f"aeon_{eq_thumb}.jpg")
+        
+        # Add task to take screenshot
         tasks.append(create_task(create_subprocess_exec(*cmd, stderr=PIPE)))
+    
     status = await gather(*tasks)
-    for task, eq_thumb in zip(status, range(1, total+1)):
+
+    # Check if all screenshots were successfully taken
+    for task, eq_thumb in zip(status, range(1, total + 1)):
         if await task.wait() != 0 or not await aiopath.exists(ospath.join(des_dir, f"aeon_{eq_thumb}.jpg")):
             err = (await task.stderr.read()).decode().strip()
             LOGGER.error(f'Error while extracting thumbnail no. {eq_thumb} from video. Name: {video_file} stderr: {err}')
             await aiormtree(des_dir)
             return None
+    
+    # Return either the directory of thumbnails or the first thumbnail
     return (des_dir, tstamps) if gen_ss else ospath.join(des_dir, "aeon_1.jpg")
 
 
