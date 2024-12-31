@@ -1,8 +1,7 @@
 #!/usr/bin/env python3
 import os
-import aiohttp
-import re
-import requests
+import aiofiles
+from io import BytesIO
 from traceback import format_exc
 from logging import getLogger, ERROR
 from aiofiles.os import remove as aioremove, path as aiopath, rename as aiorename, makedirs, rmdir, mkdir
@@ -82,11 +81,39 @@ class TgUploader:
             path = "Thumbnails"
             if not await aiopath.isdir(path):
                 await mkdir(path)
-            des_dir = ospath.join(path, f'{time()}.jpg')
-            await sync_to_async(Image.open(photo_dir).convert("RGB").save, des_dir, "JPEG")
-            await aioremove(photo_dir)
+
+            des_dir = os.path.join(path, f'{time()}.jpg')
+
+            # Resize and center image logic
+            try:
+                async with aiofiles.open(photo_dir, 'rb') as f:
+                    content = await f.read()
+                input_image = Image.open(BytesIO(content))
+
+                # Resize the image to fit within 320x320 while maintaining aspect ratio
+                thumbnail_size = (320, 320)
+                input_image.thumbnail(thumbnail_size, Image.Resampling.LANCZOS)
+
+                # Create a new blank canvas with white background
+                canvas = Image.new('RGB', thumbnail_size, 'white')
+
+                # Center the resized image on the canvas
+                x_offset = (thumbnail_size[0] - input_image.width) // 2
+                y_offset = (thumbnail_size[1] - input_image.height) // 2
+                canvas.paste(input_image, (x_offset, y_offset))
+
+                # Save the resulting thumbnail to a file
+                await sync_to_async(canvas.save, des_dir, "JPEG")
+            except Exception as e:
+                LOGGER.error(f"Image Processing Error: {e}")
+                return None
+            finally:
+                await aioremove(photo_dir)
+
             return des_dir
+
         return None
+
 
     async def __buttons(self, up_path, is_video=False):
         buttons = ButtonMaker()
