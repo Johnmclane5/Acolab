@@ -7,7 +7,7 @@ from logging import getLogger, ERROR
 from aiofiles.os import remove as aioremove, path as aiopath, rename as aiorename, makedirs, rmdir, mkdir
 from os import walk, path as ospath
 from time import time
-from PIL import Image, ImageDraw, ImageOps
+from PIL import Image
 from pyrogram import enums
 from pyrogram.types import InputMediaVideo, InputMediaDocument, InlineKeyboardMarkup
 from pyrogram.errors import FloodWait, RPCError, PeerIdInvalid, MessageNotModified, ChannelInvalid
@@ -81,51 +81,10 @@ class TgUploader:
             path = "Thumbnails"
             if not await aiopath.isdir(path):
                 await mkdir(path)
-
-            des_dir = os.path.join(path, f'{time()}.jpg')
-
-            try:
-                # Read the image from the file
-                async with aiofiles.open(photo_dir, 'rb') as f:
-                    content = await f.read()
-                input_image = Image.open(BytesIO(content))
-
-                # Resize the image to fit 320x320 while maintaining aspect ratio
-                target_size = (320, 320)
-                input_image = ImageOps.fit(input_image, target_size, method=Image.Resampling.LANCZOS)
-
-                # Create a mask for rounded corners
-                mask = Image.new("L", target_size, 0)
-                draw = ImageDraw.Draw(mask)
-                corner_radius = 40  # Adjust for desired corner roundness
-                draw.rounded_rectangle(
-                    [(0, 0), target_size],
-                    radius=corner_radius,
-                    fill=255
-                )
-
-                # Create a new canvas with a white background
-                rounded_image = Image.new("RGB", target_size, "white")
-                rounded_image.paste(input_image, (0, 0))
-
-                # Apply the rounded corners mask
-                rounded_image.putalpha(mask)
-
-                # Convert the image to RGB (removes alpha channel)
-                final_image = rounded_image.convert("RGB")
-
-                # Save the resulting image as JPEG
-                final_image.save(des_dir, format="JPEG")
-
-            except Exception as e:
-                LOGGER.error(f"Image Processing Error: {e}")
-                return None
-            finally:
-                # Clean up the original file
-                await aioremove(photo_dir)
-
+            des_dir = ospath.join(path, f'{time()}.jpg')
+            await sync_to_async(Image.open(photo_dir).convert("RGB").save, des_dir, "JPEG")
+            await aioremove(photo_dir)
             return des_dir
-
         return None
 
 
