@@ -7,7 +7,7 @@ from logging import getLogger, ERROR
 from aiofiles.os import remove as aioremove, path as aiopath, rename as aiorename, makedirs, rmdir, mkdir
 from os import walk, path as ospath
 from time import time
-from PIL import Image
+from PIL import Image, ImageDraw, ImageOps
 from pyrogram import enums
 from pyrogram.types import InputMediaVideo, InputMediaDocument, InlineKeyboardMarkup
 from pyrogram.errors import FloodWait, RPCError, PeerIdInvalid, MessageNotModified, ChannelInvalid
@@ -84,30 +84,44 @@ class TgUploader:
 
             des_dir = os.path.join(path, f'{time()}.jpg')
 
-            # Resize and center image logic
             try:
+                # Read the image from the file
                 async with aiofiles.open(photo_dir, 'rb') as f:
                     content = await f.read()
                 input_image = Image.open(BytesIO(content))
 
-                # Resize the image to fit within 320x320 while maintaining aspect ratio
-                thumbnail_size = (320, 320)
-                input_image.thumbnail(thumbnail_size, Image.Resampling.LANCZOS)
+                # Resize the image to fit 320x320 while maintaining aspect ratio
+                target_size = (320, 320)
+                input_image = ImageOps.fit(input_image, target_size, method=Image.Resampling.LANCZOS)
 
-                # Create a new blank canvas with white background
-                canvas = Image.new('RGB', thumbnail_size, 'white')
+                # Create a mask for rounded corners
+                mask = Image.new("L", target_size, 0)
+                draw = ImageDraw.Draw(mask)
+                corner_radius = 40  # Adjust for desired corner roundness
+                draw.rounded_rectangle(
+                    [(0, 0), target_size],
+                    radius=corner_radius,
+                    fill=255
+                )
 
-                # Center the resized image on the canvas
-                x_offset = (thumbnail_size[0] - input_image.width) // 2
-                y_offset = (thumbnail_size[1] - input_image.height) // 2
-                canvas.paste(input_image, (x_offset, y_offset))
+                # Create a new canvas with a white background
+                rounded_image = Image.new("RGB", target_size, "white")
+                rounded_image.paste(input_image, (0, 0))
 
-                # Save the resulting thumbnail to a file
-                await sync_to_async(canvas.save, des_dir, "JPEG")
+                # Apply the rounded corners mask
+                rounded_image.putalpha(mask)
+
+                # Convert the image to RGB (removes alpha channel)
+                final_image = rounded_image.convert("RGB")
+
+                # Save the resulting image as JPEG
+                final_image.save(des_dir, format="JPEG")
+
             except Exception as e:
                 LOGGER.error(f"Image Processing Error: {e}")
                 return None
             finally:
+                # Clean up the original file
                 await aioremove(photo_dir)
 
             return des_dir
