@@ -49,7 +49,7 @@ async def get_movie_poster(movie_name, release_year):
 
 
 
-                        tmdb_movie_image_url = f'https://api.themoviedb.org/3/{media_type}/{movie_id}/images?api_key={Config.TMDB_API_KEY}&language=en-US&include_image_language=en,hi'
+                        tmdb_movie_image_url = f'https://api.themoviedb.org/3/{media_type}/{movie_id}/images?api_key={TMDB_API_KEY}&language=en-US&include_image_language=en,hi'
 
                         async with session.get(tmdb_movie_image_url) as movie_response:
                             movie_images = await movie_response.json()
