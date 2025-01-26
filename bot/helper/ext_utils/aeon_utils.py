@@ -29,7 +29,7 @@ async def extract_movie_info(caption):
     
 async def get_movie_poster(movie_name, release_year):
     TMDB_API_KEY = config_dict['TMDB_API_KEY']
-    tmdb_search_url = f'https://api.themoviedb.org/3/search/multi?api_key={Config.TMDB_API_KEY}&query={movie_name}'
+    tmdb_search_url = f'https://api.themoviedb.org/3/search/multi?api_key={TMDB_API_KEY}&query={movie_name}'
     try:
         async with aiohttp.ClientSession() as session:
             async with session.get(tmdb_search_url) as search_response:
