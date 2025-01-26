@@ -375,9 +375,7 @@ class TgUploader:
                         thumb = await self.get_custom_thumb(tmdb_poster_url)
                         LOGGER.info("Got the poster")
                     else:
-                        LOGGER.info("Poster not found")
-                        thumb = await self.get_custom_thumb("https://graph.org/file/7fe42849e24d029e06615.jpg")
-
+                        thumb = await take_ss(self.__up_path, None)
                 if self.__is_cancelled:
                     return
                 buttons = await self.__buttons(self.__up_path, is_video)
